@@ -16,7 +16,7 @@ class ActasControlador extends BaseController
     {
         $actas = new Acta();
 
-        $actas = $actas->all();
+        $actas = $actas->all(['usuarios', 'reuniones']);
 
         Respuesta::json($actas);
     }

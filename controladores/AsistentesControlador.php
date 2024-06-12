@@ -16,7 +16,7 @@ class AsistentesControlador extends BaseController
     {
         $asistentes = new Asistente();
 
-        $asistentes = $asistentes->all();
+        $asistentes = $asistentes->all(['usuarios', 'reuniones']);
 
         Respuesta::json($asistentes);
     }

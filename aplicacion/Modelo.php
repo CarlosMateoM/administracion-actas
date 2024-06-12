@@ -15,6 +15,7 @@ abstract class Modelo
     protected array $original = [];
     protected array $attributes = [];
     protected string $primaryKey = 'id';
+    protected array $relations = [];
 
     public function __construct()
     {
@@ -33,16 +34,38 @@ abstract class Modelo
         }
     }
 
-    public function all(): array
+    public function all(array $with = []): array
     {
         try {
-            $sql = "SELECT * FROM {$this->tabla}";
+            $sql = $this->buildSelectQuery($with);
             $prepare = $this->pdo->prepare($sql);
             $prepare->execute();
             return $prepare->fetchAll(PDO::FETCH_OBJ);
         } catch (Exception $e) {
             throw new Exception("Error fetching all records: " . $e->getMessage());
         }
+    }
+
+    protected function buildSelectQuery(array $with = []): string
+    {
+        $select = "SELECT {$this->tabla}.*";
+        $join = "";
+
+        foreach ($with as $relation) {
+
+            if (isset($this->relations[$relation])) {
+
+                $related = $this->relations[$relation];
+                $relatedTable = $related['table'];
+                $foreignKey = $related['foreign_key'];
+                $primaryKey = $related['primary_key'] ?? $this->primaryKey;
+
+                $select .= ", {$relatedTable}.*";
+                $join .= " JOIN {$relatedTable} ON {$this->tabla}.{$foreignKey} = {$relatedTable}.{$primaryKey}";
+            }
+        }
+
+        return "$select FROM {$this->tabla} $join";
     }
 
     public function find(int|string $id): ?object

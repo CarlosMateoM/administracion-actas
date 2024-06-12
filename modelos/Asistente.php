@@ -15,6 +15,17 @@ class Asistente extends Modelo
         'reunion_id' => null
     ];
 
+    protected array $relations = [
+        'usuarios' => [
+            'table' => 'usuarios',
+            'foreign_key' => 'usuario_id',
+        ],
+        'reuniones' => [
+            'table' => 'reuniones',
+            'foreign_key' => 'reunion_id'
+        ]
+    ];
+
     public function __construct()
     {
         parent::__construct();
